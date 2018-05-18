@@ -1,0 +1,2 @@
+# myJson
+json for golang
