@@ -95,6 +95,21 @@ func checkDataType(itf interface{}) MSType {
 	return MS_TYPE_UNKNOW
 }
 
+/// parse file
+func ParseFromFile(strFile string) (*MS_tgC_MyJson, error) {
+	myjson := NewMS_tgC_MyJson()
+	err := myjson.ParseFromFile(strFile)
+	return myjson, err
+}
+
+/// parse buffer
+func ParseFromBuffer(buf []byte) (*MS_tgC_MyJson, error) {
+	myjson := NewMS_tgC_MyJson()
+	err := myjson.ParseFromBuffer(buf)
+	return myjson, err
+}
+
+/// format string
 func FormatMyJson(myJson *MS_tgC_MyJson) string {
 	if nil == myJson {
 		return ""
