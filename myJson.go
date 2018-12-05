@@ -207,6 +207,10 @@ func (slf *MS_tgC_MyJson) IsString(sTag string) error {
 	return fmt.Errorf("not string")
 }
 
+func (slf *MS_tgC_MyJson) IsNumberic(sTag string) error {
+	return slf.IsInt(sTag)
+}
+
 func (slf *MS_tgC_MyJson) IsInt(sTag string) error {
 	itf, err := slf.ExistOfTag(sTag)
 	if err != nil {
@@ -215,7 +219,7 @@ func (slf *MS_tgC_MyJson) IsInt(sTag string) error {
 
 	mstype := checkDataType(itf)
 
-	if mstype == MS_TYPE_Int || mstype == MS_TYPE_Int32 || mstype == MS_TYPE_Int64 {
+	if mstype == MS_TYPE_Int || mstype == MS_TYPE_Int32 || mstype == MS_TYPE_Int64 || mstype == MS_TYPE_Float32 || mstype == MS_TYPE_Float64 {
 		return nil
 	}
 
