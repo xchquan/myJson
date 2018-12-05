@@ -163,7 +163,12 @@ func (slf *MS_tgC_MyJson) ExistOfTag(sTag string) (interface{}, error) {
 }
 
 func (slf *MS_tgC_MyJson) IsArray(sTag string) error {
-	mstype := checkDataType(slf.jsVal)
+	itf, err := slf.ExistOfTag(sTag)
+	if err != nil {
+		return err
+	}
+
+	mstype := checkDataType(itf)
 
 	if mstype == MS_TYPE_Array {
 		return nil
@@ -173,7 +178,12 @@ func (slf *MS_tgC_MyJson) IsArray(sTag string) error {
 }
 
 func (slf *MS_tgC_MyJson) IsObjs(sTag string) error {
-	mstype := checkDataType(slf.jsVal)
+	itf, err := slf.ExistOfTag(sTag)
+	if err != nil {
+		return err
+	}
+
+	mstype := checkDataType(itf)
 
 	if mstype == MS_TYPE_MAP {
 		return nil
@@ -183,7 +193,12 @@ func (slf *MS_tgC_MyJson) IsObjs(sTag string) error {
 }
 
 func (slf *MS_tgC_MyJson) IsString(sTag string) error {
-	mstype := checkDataType(slf.jsVal)
+	itf, err := slf.ExistOfTag(sTag)
+	if err != nil {
+		return err
+	}
+
+	mstype := checkDataType(itf)
 
 	if mstype == MS_TYPE_STRING {
 		return nil
@@ -193,7 +208,12 @@ func (slf *MS_tgC_MyJson) IsString(sTag string) error {
 }
 
 func (slf *MS_tgC_MyJson) IsInt(sTag string) error {
-	mstype := checkDataType(slf.jsVal)
+	itf, err := slf.ExistOfTag(sTag)
+	if err != nil {
+		return err
+	}
+
+	mstype := checkDataType(itf)
 
 	if mstype == MS_TYPE_Int || mstype == MS_TYPE_Int32 || mstype == MS_TYPE_Int64 {
 		return nil
@@ -203,7 +223,12 @@ func (slf *MS_tgC_MyJson) IsInt(sTag string) error {
 }
 
 func (slf *MS_tgC_MyJson) IsFloat(sTag string) error {
-	mstype := checkDataType(slf.jsVal)
+	itf, err := slf.ExistOfTag(sTag)
+	if err != nil {
+		return err
+	}
+
+	mstype := checkDataType(itf)
 
 	if mstype == MS_TYPE_Float32 || mstype == MS_TYPE_Float64 {
 		return nil
@@ -214,47 +239,70 @@ func (slf *MS_tgC_MyJson) IsFloat(sTag string) error {
 
 /// get special type's data
 func (slf *MS_tgC_MyJson) AsArray(sTag string) ([]interface{}, error) {
-	err := slf.IsArray(sTag)
-	if nil != err {
+	itf, err := slf.ExistOfTag(sTag)
+	if err != nil {
 		return nil, err
 	}
 
-	res := slf.jsVal.([]interface{})
+	mstype := checkDataType(itf)
+
+	if mstype != MS_TYPE_Array {
+		return nil, fmt.Errorf("not array")
+	}
+
+	res := itf.([]interface{})
 	return res, nil
 }
 
 func (slf *MS_tgC_MyJson) AsMap(sTag string) (map[string]interface{}, error) {
-	err := slf.IsObjs(sTag)
-	if nil != err {
+	itf, err := slf.ExistOfTag(sTag)
+	if err != nil {
 		return nil, err
 	}
 
-	res := slf.jsVal.(map[string]interface{})
+	mstype := checkDataType(itf)
+
+	if mstype != MS_TYPE_MAP {
+		return nil, fmt.Errorf("not objs")
+	}
+
+	res := itf.(map[string]interface{})
 	return res, nil
 }
 
 func (slf *MS_tgC_MyJson) AsString(sTag string) (string, error) {
-	err := slf.IsString(sTag)
-	if nil != err {
+	itf, err := slf.ExistOfTag(sTag)
+	if err != nil {
 		return "", err
 	}
 
-	res := slf.jsVal.(string)
+	mstype := checkDataType(itf)
+
+	if mstype == MS_TYPE_STRING {
+		return "", fmt.Errorf("not string")
+	}
+
+	res := itf.(string)
 	return res, nil
 }
 
 func (slf *MS_tgC_MyJson) AsInt(sTag string) (int64, error) {
-	mstype := checkDataType(slf.jsVal)
+	itf, err := slf.ExistOfTag(sTag)
+	if err != nil {
+		return 0, err
+	}
+
+	mstype := checkDataType(itf)
 
 	switch mstype {
 	case MS_TYPE_Int:
-		res := slf.jsVal.(int)
+		res := itf.(int)
 		return int64(res), nil
 	case MS_TYPE_Int32:
-		res := slf.jsVal.(int32)
+		res := itf.(int32)
 		return int64(res), nil
 	case MS_TYPE_Int64:
-		res := slf.jsVal.(int64)
+		res := itf.(int64)
 		return res, nil
 	default:
 		return 0, fmt.Errorf("type isn't int")
@@ -262,14 +310,19 @@ func (slf *MS_tgC_MyJson) AsInt(sTag string) (int64, error) {
 }
 
 func (slf *MS_tgC_MyJson) AsFloat(sTag string) (float64, error) {
-	mstype := checkDataType(slf.jsVal)
+	itf, err := slf.ExistOfTag(sTag)
+	if err != nil {
+		return 0, err
+	}
+
+	mstype := checkDataType(itf)
 
 	switch mstype {
 	case MS_TYPE_Float32:
-		res := slf.jsVal.(float32)
+		res := itf.(float32)
 		return float64(res), nil
 	case MS_TYPE_Float64:
-		res := slf.jsVal.(float64)
+		res := itf.(float64)
 		return res, nil
 	default:
 		return 0, fmt.Errorf("type isn't float")
