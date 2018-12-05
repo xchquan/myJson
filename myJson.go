@@ -37,13 +37,13 @@ func NewMS_tgC_MyJson() *MS_tgC_MyJson {
 }
 
 /// parse from buffer
-func (self *MS_tgC_MyJson) ParseFromBuffer(buf []byte) error {
-	err := json.Unmarshal(buf, &self.jsVal)
+func (slf *MS_tgC_MyJson) ParseFromBuffer(buf []byte) error {
+	err := json.Unmarshal(buf, &slf.jsVal)
 	return err
 }
 
 /// parse from file
-func (self *MS_tgC_MyJson) ParseFromFile(strFile string) error {
+func (slf *MS_tgC_MyJson) ParseFromFile(strFile string) error {
 	file, err := os.Open(strFile)
 	if nil != err {
 		return err
@@ -63,7 +63,7 @@ func (self *MS_tgC_MyJson) ParseFromFile(strFile string) error {
 	}
 
 	buf = buf[0:resLen]
-	return self.ParseFromBuffer(buf)
+	return slf.ParseFromBuffer(buf)
 }
 
 /// get data's type
@@ -139,29 +139,31 @@ func FormatMyJson2(myJson *MS_tgC_MyJson) string {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// get data from MyJson
-func (self *MS_tgC_MyJson) ExistOfTag(sTag string) error {
+func (slf *MS_tgC_MyJson) ExistOfTag(sTag string) (interface{}, error) {
 
-	mstype := checkDataType(self.jsVal)
+	mstype := checkDataType(slf.jsVal)
 
 	switch mstype {
 	case MS_TYPE_UNKNOW:
-		return fmt.Errorf("val's type is not define")
+		return nil, fmt.Errorf("val's type is not define")
 	case MS_TYPE_MAP:
 		break
 	default:
-		return fmt.Errorf("json's format isn't map")
+		return nil, fmt.Errorf("json's format isn't map")
 	}
 
-	mapval := self.jsVal.(map[string]interface{})
-	if _, ok := mapval[sTag]; !ok {
-		return fmt.Errorf("tag[%s] isn't exist", sTag)
+	mapval := slf.jsVal.(map[string]interface{})
+	res, ok := mapval[sTag]
+
+	if !ok {
+		return nil, fmt.Errorf("tag[%s] isn't exist", sTag)
 	}
 
-	return nil
+	return res, nil
 }
 
-func (self *MS_tgC_MyJson) IsArray(sTag string) error {
-	mstype := checkDataType(self.jsVal)
+func (slf *MS_tgC_MyJson) IsArray(sTag string) error {
+	mstype := checkDataType(slf.jsVal)
 
 	if mstype == MS_TYPE_Array {
 		return nil
@@ -170,8 +172,8 @@ func (self *MS_tgC_MyJson) IsArray(sTag string) error {
 	return fmt.Errorf("not array")
 }
 
-func (self *MS_tgC_MyJson) IsObjs(sTag string) error {
-	mstype := checkDataType(self.jsVal)
+func (slf *MS_tgC_MyJson) IsObjs(sTag string) error {
+	mstype := checkDataType(slf.jsVal)
 
 	if mstype == MS_TYPE_MAP {
 		return nil
@@ -180,8 +182,8 @@ func (self *MS_tgC_MyJson) IsObjs(sTag string) error {
 	return fmt.Errorf("not objs")
 }
 
-func (self *MS_tgC_MyJson) IsString(sTag string) error {
-	mstype := checkDataType(self.jsVal)
+func (slf *MS_tgC_MyJson) IsString(sTag string) error {
+	mstype := checkDataType(slf.jsVal)
 
 	if mstype == MS_TYPE_STRING {
 		return nil
@@ -190,8 +192,8 @@ func (self *MS_tgC_MyJson) IsString(sTag string) error {
 	return fmt.Errorf("not string")
 }
 
-func (self *MS_tgC_MyJson) IsInt(sTag string) error {
-	mstype := checkDataType(self.jsVal)
+func (slf *MS_tgC_MyJson) IsInt(sTag string) error {
+	mstype := checkDataType(slf.jsVal)
 
 	if mstype == MS_TYPE_Int || mstype == MS_TYPE_Int32 || mstype == MS_TYPE_Int64 {
 		return nil
@@ -200,8 +202,8 @@ func (self *MS_tgC_MyJson) IsInt(sTag string) error {
 	return fmt.Errorf("not int")
 }
 
-func (self *MS_tgC_MyJson) IsFloat(sTag string) error {
-	mstype := checkDataType(self.jsVal)
+func (slf *MS_tgC_MyJson) IsFloat(sTag string) error {
+	mstype := checkDataType(slf.jsVal)
 
 	if mstype == MS_TYPE_Float32 || mstype == MS_TYPE_Float64 {
 		return nil
@@ -211,63 +213,63 @@ func (self *MS_tgC_MyJson) IsFloat(sTag string) error {
 }
 
 /// get special type's data
-func (self *MS_tgC_MyJson) AsArray(sTag string) ([]interface{}, error) {
-	err := self.IsArray(sTag)
+func (slf *MS_tgC_MyJson) AsArray(sTag string) ([]interface{}, error) {
+	err := slf.IsArray(sTag)
 	if nil != err {
 		return nil, err
 	}
 
-	res := self.jsVal.([]interface{})
+	res := slf.jsVal.([]interface{})
 	return res, nil
 }
 
-func (self *MS_tgC_MyJson) AsMap(sTag string) (map[string]interface{}, error) {
-	err := self.IsObjs(sTag)
+func (slf *MS_tgC_MyJson) AsMap(sTag string) (map[string]interface{}, error) {
+	err := slf.IsObjs(sTag)
 	if nil != err {
 		return nil, err
 	}
 
-	res := self.jsVal.(map[string]interface{})
+	res := slf.jsVal.(map[string]interface{})
 	return res, nil
 }
 
-func (self *MS_tgC_MyJson) AsString(sTag string) (string, error) {
-	err := self.IsString(sTag)
+func (slf *MS_tgC_MyJson) AsString(sTag string) (string, error) {
+	err := slf.IsString(sTag)
 	if nil != err {
 		return "", err
 	}
 
-	res := self.jsVal.(string)
+	res := slf.jsVal.(string)
 	return res, nil
 }
 
-func (self *MS_tgC_MyJson) AsInt(sTag string) (int64, error) {
-	mstype := checkDataType(self.jsVal)
+func (slf *MS_tgC_MyJson) AsInt(sTag string) (int64, error) {
+	mstype := checkDataType(slf.jsVal)
 
 	switch mstype {
 	case MS_TYPE_Int:
-		res := self.jsVal.(int)
+		res := slf.jsVal.(int)
 		return int64(res), nil
 	case MS_TYPE_Int32:
-		res := self.jsVal.(int32)
+		res := slf.jsVal.(int32)
 		return int64(res), nil
 	case MS_TYPE_Int64:
-		res := self.jsVal.(int64)
+		res := slf.jsVal.(int64)
 		return res, nil
 	default:
 		return 0, fmt.Errorf("type isn't int")
 	}
 }
 
-func (self *MS_tgC_MyJson) AsFloat(sTag string) (float64, error) {
-	mstype := checkDataType(self.jsVal)
+func (slf *MS_tgC_MyJson) AsFloat(sTag string) (float64, error) {
+	mstype := checkDataType(slf.jsVal)
 
 	switch mstype {
 	case MS_TYPE_Float32:
-		res := self.jsVal.(float32)
+		res := slf.jsVal.(float32)
 		return float64(res), nil
 	case MS_TYPE_Float64:
-		res := self.jsVal.(float64)
+		res := slf.jsVal.(float64)
 		return res, nil
 	default:
 		return 0, fmt.Errorf("type isn't float")
@@ -276,62 +278,62 @@ func (self *MS_tgC_MyJson) AsFloat(sTag string) (float64, error) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// orgnization data for MyJson
-func (self *MS_tgC_MyJson) NewArray() {
+func (slf *MS_tgC_MyJson) NewArray() {
 	var itf []interface{}
-	self.jsVal = itf
+	slf.jsVal = itf
 }
 
-func (self *MS_tgC_MyJson) NewMap() {
-	self.jsVal = make(map[string]interface{})
+func (slf *MS_tgC_MyJson) NewMap() {
+	slf.jsVal = make(map[string]interface{})
 }
 
-func (self *MS_tgC_MyJson) Append(itfval interface{}) error {
+func (slf *MS_tgC_MyJson) Append(itfval interface{}) error {
 	if nil == itfval {
 		return fmt.Errorf("interface is nil")
 	}
 
-	mstype := checkDataType(self.jsVal)
+	mstype := checkDataType(slf.jsVal)
 
 	if mstype == MS_TYPE_UNKNOW {
-		self.NewArray()
+		slf.NewArray()
 	} else if mstype != MS_TYPE_Array {
 		return fmt.Errorf("type isn't array")
 	}
 
 	if itfJson, ok := itfval.(*MS_tgC_MyJson); ok {
-		itf, _ := self.jsVal.([]interface{})
-		self.jsVal = append(itf, itfJson.jsVal)
+		itf, _ := slf.jsVal.([]interface{})
+		slf.jsVal = append(itf, itfJson.jsVal)
 	} else if itfJson, ok := itfval.(MS_tgC_MyJson); ok {
-		itf, _ := self.jsVal.([]interface{})
-		self.jsVal = append(itf, itfJson.jsVal)
+		itf, _ := slf.jsVal.([]interface{})
+		slf.jsVal = append(itf, itfJson.jsVal)
 	} else {
-		itf, _ := self.jsVal.([]interface{})
-		self.jsVal = append(itf, itfval)
+		itf, _ := slf.jsVal.([]interface{})
+		slf.jsVal = append(itf, itfval)
 	}
 	return nil
 }
 
-func (self *MS_tgC_MyJson) SetObjs(sTag string, itfval interface{}) error {
+func (slf *MS_tgC_MyJson) SetObjs(sTag string, itfval interface{}) error {
 	if nil == itfval {
 		return fmt.Errorf("interface is nil")
 	}
 
-	mstype := checkDataType(self.jsVal)
+	mstype := checkDataType(slf.jsVal)
 
 	if mstype == MS_TYPE_UNKNOW {
-		self.NewMap()
+		slf.NewMap()
 	} else if mstype != MS_TYPE_MAP {
 		return fmt.Errorf("type isn't array")
 	}
 
 	if itfJson, ok := itfval.(*MS_tgC_MyJson); ok {
-		itf, _ := self.jsVal.(map[string]interface{})
+		itf, _ := slf.jsVal.(map[string]interface{})
 		itf[sTag] = itfJson.jsVal
 	} else if itfJson, ok := itfval.(MS_tgC_MyJson); ok {
-		itf, _ := self.jsVal.(map[string]interface{})
+		itf, _ := slf.jsVal.(map[string]interface{})
 		itf[sTag] = itfJson.jsVal
 	} else {
-		itf, _ := self.jsVal.(map[string]interface{})
+		itf, _ := slf.jsVal.(map[string]interface{})
 		itf[sTag] = itfval
 	}
 	return nil
@@ -339,12 +341,12 @@ func (self *MS_tgC_MyJson) SetObjs(sTag string, itfval interface{}) error {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// control
-func (self *MS_tgC_MyJson) Clear() {
-	self.jsVal = nil
+func (slf *MS_tgC_MyJson) Clear() {
+	slf.jsVal = nil
 }
 
-func (self *MS_tgC_MyJson) IsNil() error {
-	if nil == self.jsVal {
+func (slf *MS_tgC_MyJson) IsNil() error {
+	if nil == slf.jsVal {
 		return nil
 	} else {
 		return fmt.Errorf("items exist")
