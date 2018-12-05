@@ -308,6 +308,12 @@ func (slf *MS_tgC_MyJson) AsInt(sTag string) (int64, error) {
 	case MS_TYPE_Int64:
 		res := itf.(int64)
 		return res, nil
+	case MS_TYPE_Float32:
+		res := itf.(float32)
+		return int64(res), nil
+	case MS_TYPE_Float64:
+		res := itf.(float64)
+		return int64(res), nil
 	default:
 		return 0, fmt.Errorf("type isn't int")
 	}
