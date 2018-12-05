@@ -278,7 +278,7 @@ func (slf *MS_tgC_MyJson) AsString(sTag string) (string, error) {
 
 	mstype := checkDataType(itf)
 
-	if mstype == MS_TYPE_STRING {
+	if mstype != MS_TYPE_STRING {
 		return "", fmt.Errorf("not string")
 	}
 
