@@ -114,17 +114,17 @@ func ParseFromBuffer(buf []byte) (*MS_tgC_MyJson, error) {
 }
 
 /// format string
-func FormatMyJson(myJson *MS_tgC_MyJson) string {
+func FormatMyJson(myJson *MS_tgC_MyJson) (string, error) {
 	if nil == myJson {
-		return ""
+		return "", fmt.Errorf("point of myjson is nil")
 	}
 
 	buf, err := json.Marshal(myJson.jsVal)
 	if nil != err {
-		return ""
-	} else {
-		return string(buf)
+		return "", err
 	}
+
+	return string(buf), nil
 }
 
 /// new myjson object
@@ -134,11 +134,11 @@ func OrgMyJson(itf interface{}) *MS_tgC_MyJson {
 	return myjson
 }
 
-func FormatMyJson2(myJson *MS_tgC_MyJson) string {
+func FormatMyJson2(myJson *MS_tgC_MyJson) (string, error) {
 	if nil == myJson {
-		return ""
+		return "", fmt.Errorf("point of myjson is nil")
 	}
-	return fmt.Sprintf("%v", myJson)
+	return fmt.Sprintf("%v", myJson), nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
