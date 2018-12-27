@@ -30,3 +30,39 @@ func TestXYZ(t *testing.T) {
 	str = FormatMyJson2(myJson)
 	fmt.Println("res2 = ", str)
 }
+
+const (
+	textJs = `{"ip":"127.0.0.1", "port":6379, "enable": true}`
+)
+
+func Test2(t *testing.T) {
+	mjs, err := ParseFromBuffer([]byte(textJs))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	str, err := mjs.AsString("ip")
+	if err != nil {
+		fmt.Println(err)
+		return
+	} else {
+		fmt.Println(str)
+	}
+
+	port, err := mjs.AsInt("port")
+	if err != nil {
+		fmt.Println(err)
+		return
+	} else {
+		fmt.Println(port)
+	}
+
+	benable, err := mjs.AsBool("enable")
+	if err != nil {
+		fmt.Println(err)
+		return
+	} else {
+		fmt.Println(benable)
+	}
+}

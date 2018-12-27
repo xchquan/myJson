@@ -13,9 +13,10 @@ import (
 type MSType int
 
 const (
-	MS_TYPE_Array = iota
+	MS_TYPE_Array MSType = iota
 	MS_TYPE_MAP
 	MS_TYPE_STRING
+	MS_TYPE_BOOL
 	MS_TYPE_Int
 	MS_TYPE_Int32
 	MS_TYPE_Int64
@@ -44,6 +45,7 @@ func (slf *MS_tgC_MyJson) ParseFromBuffer(buf []byte) error {
 
 /// parse from file
 func (slf *MS_tgC_MyJson) ParseFromFile(strFile string) error {
+
 	file, err := os.Open(strFile)
 	if nil != err {
 		return err
@@ -76,6 +78,8 @@ func checkDataType(itf interface{}) MSType {
 		return MS_TYPE_Array
 	case map[string]interface{}:
 		return MS_TYPE_MAP
+	case bool:
+		return MS_TYPE_BOOL
 	case string:
 		return MS_TYPE_STRING
 	case int:
@@ -192,6 +196,21 @@ func (slf *MS_tgC_MyJson) IsObjs(sTag string) error {
 	return fmt.Errorf("not objs")
 }
 
+func (slf *MS_tgC_MyJson) IsBool(sTag string) error {
+	itf, err := slf.ExistOfTag(sTag)
+	if err != nil {
+		return err
+	}
+
+	mstype := checkDataType(itf)
+
+	if mstype == MS_TYPE_BOOL {
+		return nil
+	}
+
+	return fmt.Errorf("not bool")
+}
+
 func (slf *MS_tgC_MyJson) IsString(sTag string) error {
 	itf, err := slf.ExistOfTag(sTag)
 	if err != nil {
@@ -271,6 +290,21 @@ func (slf *MS_tgC_MyJson) AsMap(sTag string) (map[string]interface{}, error) {
 	}
 
 	res := itf.(map[string]interface{})
+	return res, nil
+}
+
+func (slf *MS_tgC_MyJson) AsBool(sTag string) (bool, error) {
+	itf, err := slf.ExistOfTag(sTag)
+	if err != nil {
+		return false, err
+	}
+
+	mstype := checkDataType(itf)
+	if mstype != MS_TYPE_BOOL {
+		return false, fmt.Errorf("not bool")
+	}
+
+	res := itf.(bool)
 	return res, nil
 }
 
