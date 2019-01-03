@@ -2,10 +2,11 @@
  * Created by huQg on 2018/5/17,017.
  */
 
-package myJson
+package myJson_test
 
 import (
 	"fmt"
+	. "myself/myJson"
 	"testing"
 )
 
@@ -24,10 +25,10 @@ func TestXYZ(t *testing.T) {
 
 	myJson.SetObjs("school", myJsonTmp)
 
-	str := FormatMyJson(myJson)
+	str, _ := FormatMyJson(myJson)
 	fmt.Println("res1 = ", str)
 
-	str = FormatMyJson2(myJson)
+	str, _ = FormatMyJson2(myJson)
 	fmt.Println("res2 = ", str)
 }
 
@@ -64,5 +65,45 @@ func Test2(t *testing.T) {
 		return
 	} else {
 		fmt.Println(benable)
+	}
+}
+
+func Test3(t *testing.T) {
+	mjs1 := NewMS_tgC_MyJson()
+	mjs2 := NewMS_tgC_MyJson()
+
+	mjs1.SetObjs("a", 1)
+	mjs2.SetObjs("b", 3)
+
+	mjs1.Append(mjs2)
+
+	sjs, _ := FormatMyJson(mjs1)
+	fmt.Println(sjs)
+}
+
+func TestArray(t *testing.T) {
+	strAry := "[\"1\",\"2\",\"3\",\"4\",\"a\",\"b\",\"c\",\"d\",\"e\",\"f\"]"
+
+	mJs, err := ParseFromBuffer([]byte(strAry))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	var sRes []string
+	res, err := mJs.AsArray("")
+	if err != nil {
+		fmt.Println(err)
+		return
+	} else {
+		fmt.Println(res)
+	}
+
+	err = mJs.AsArrayWithResult("", &sRes)
+	if err != nil {
+		fmt.Println(err)
+		return
+	} else {
+		fmt.Println(sRes)
 	}
 }

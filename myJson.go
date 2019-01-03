@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"reflect"
 )
 
 type MSType int
@@ -166,7 +167,19 @@ func (slf *MS_tgC_MyJson) ExistOfTag(sTag string) (interface{}, error) {
 	return res, nil
 }
 
+func (slf *MS_tgC_MyJson) isArrayBase() error {
+	mstype := checkDataType(slf.jsVal)
+	if mstype == MS_TYPE_Array {
+		return nil
+	}
+	return fmt.Errorf("not array")
+}
+
 func (slf *MS_tgC_MyJson) IsArray(sTag string) error {
+	if len(sTag) == 0 {
+		return slf.isArrayBase()
+	}
+
 	itf, err := slf.ExistOfTag(sTag)
 	if err != nil {
 		return err
@@ -260,8 +273,21 @@ func (slf *MS_tgC_MyJson) IsFloat(sTag string) error {
 	return fmt.Errorf("not float")
 }
 
+func (slf *MS_tgC_MyJson) asArrayBase() ([]interface{}, error) {
+	if err := slf.isArrayBase(); err != nil {
+		return nil, err
+	}
+
+	res := slf.jsVal.([]interface{})
+	return res, nil
+}
+
 /// get special type's data
 func (slf *MS_tgC_MyJson) AsArray(sTag string) ([]interface{}, error) {
+	if len(sTag) == 0 {
+		return slf.asArrayBase()
+	}
+
 	itf, err := slf.ExistOfTag(sTag)
 	if err != nil {
 		return nil, err
@@ -275,6 +301,38 @@ func (slf *MS_tgC_MyJson) AsArray(sTag string) ([]interface{}, error) {
 
 	res := itf.([]interface{})
 	return res, nil
+}
+
+func (slf *MS_tgC_MyJson) AsArrayWithResult(sTag string, result interface{}) error {
+
+	var res []interface{}
+	var err error
+
+	if len(sTag) == 0 {
+		res, err = slf.asArrayBase()
+	} else {
+		res, err = slf.AsArray(sTag)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	resultv := reflect.ValueOf(result)
+	if resultv.Kind() != reflect.Ptr || resultv.Elem().Kind() != reflect.Slice {
+		panic("result argument must be a slice address")
+	}
+
+	slicev := resultv.Elem()
+	elemt := slicev.Type().Elem()
+
+	for _, v := range res {
+		elemtp := reflect.New(elemt)
+		elemtp.Elem().Set(reflect.ValueOf(v))
+		slicev = reflect.Append(slicev, elemtp.Elem())
+	}
+	resultv.Elem().Set(slicev)
+	return nil
 }
 
 func (slf *MS_tgC_MyJson) AsMap(sTag string) (map[string]interface{}, error) {
